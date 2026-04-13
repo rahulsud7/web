@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SortMyPrep — Clarity in the Chaos</title>
+<style>
+/* ════════════════════════════════════════════════════════════
+   MASTER RESET & HIGH-PERFORMANCE UTILITIES
+════════════════════════════════════════════════════════════ */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: #050505; /* Deep cinematic dark */
+  color: #fff;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Hardware Accelerated Cursor Glow */
+.cursor-glow {
+  position: fixed;
+  top: 0; left: 0;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(75, 163, 227, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  transform: translate3d(-50%, -50%, 0);
+  will-change: transform;
+}
+
+/* Master Navigation (Apple Glass Dock) */
+.glass-dock {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translate3d(-50%, 0, 0);
+  background: rgba(25, 25, 30, 0.4);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 32px;
+  padding: 8px;
+  display: flex;
+  gap: 8px;
+  z-index: 9999;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.dock-btn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  padding: 10px 20px;
+  border-radius: 24px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, background, color;
+}
+
+.dock-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+.dock-btn.active {
+  background: #4BA3E3;
+  color: #0B1D35;
+  box-shadow: 0 4px 15px rgba(75, 163, 227, 0.3);
+}
+
+/* View Container */
+.master-view {
+  display: none;
+  opacity: 0;
+  animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: opacity, transform;
+  min-height: 100vh;
+  position: relative;
+  z-index: 10;
+}
+
+.master-view.active {
+  display: block;
+}
+
+/* Light Theme Reset for Prototypes */
+.light-theme-wrapper {
+  background: #f0f4f8;
+  color: #111;
+}
+
+@keyframes fadeUp {
+  0% { opacity: 0; transform: translate3d(0, 20px, 0); }
+  100% { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+/* ════════════════════════════════════════════════════════════
+   LANDING PAGE STYLES (Apple Glass & Digital Brutalism blend)
+════════════════════════════════════════════════════════════ */
+#landing-view {
+  padding: 80px 24px 120px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.hero-section {
+  text-align: center;
+  margin-bottom: 80px;
+}
+
+.hero-tag {
+  display: inline-block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: rgba(75, 163, 227, 0.1);
+  border: 1px solid rgba(75, 163, 227, 0.2);
+  color: #4BA3E3;
+  margin-bottom: 24px;
+}
+
+.hero-title {
+  font-size: clamp(48px, 6vw, 84px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  background: linear-gradient(180deg, #FFFFFF 0%, rgba(255, 255, 255, 0.6) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 24px;
+}
+
+.hero-sub {
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.6);
+  max-width: 600px;
+  margin: 0 auto 40px;
+  line-height: 1.6;
+}
+
+/* Glass Panels */
+.glass-panel {
+  background: rgba(25, 25, 30, 0.3);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 24px;
+  padding: 40px;
+  margin-bottom: 40px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.glass-panel h2 {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  letter-spacing: -0.02em;
+}
+
+.glass-panel p {
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.7;
+  font-size: 16px;
+}
+
+/* Prototype Showcase Grid */
+.showcase-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  margin-top: 40px;
+}
+
+.showcase-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 30px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.showcase-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: linear-gradient(135deg, rgba(75, 163, 227, 0.1) 0%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.showcase-card:hover {
+  transform: translateY(-8px);
+  border-color: rgba(75, 163, 227, 0.4);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4), 0 0 20px rgba(75, 163, 227, 0.1);
+}
+
+.showcase-card:hover::before { opacity: 1; }
+
+.sc-icon { font-size: 32px; margin-bottom: 20px; }
+.sc-title { font-size: 20px; font-weight: 600; margin-bottom: 10px; color: #fff; }
+.sc-desc { font-size: 14px; color: rgba(255, 255, 255, 0.5); line-height: 1.5; }
+
+/* Empty Section */
+.empty-section {
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  border-radius: 24px;
+  margin-bottom: 40px;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* ════════════════════════════════════════════════════════════
+   PROTOTYPE SHARED & SCOPED CSS (From original files)
+════════════════════════════════════════════════════════════ */
+.p-scope .topbar{background:#0B1D35;padding:12px 24px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:100;}
+.p-scope .logo{font-size:15px;font-weight:700;color:#fff;letter-spacing:0.01em;}
+.p-scope .logo span{color:#4BA3E3;}
+.p-scope .avatar{width:30px;height:30px;border-radius:50%;background:#4BA3E3;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#0B1D35;cursor:pointer;flex-shrink:0;}
+.p-scope .top-nav{display:flex;gap:4px;margin-left:auto;}
+.p-scope .tnav{font-size:12px;padding:6px 14px;border-radius:12px;color:rgba(255,255,255,0.5);cursor:pointer;border:none;background:transparent;font-family:inherit;transition:all 0.15s;}
+.p-scope .tnav:hover{color:#fff;}
+.p-scope .tnav.on{background:rgba(255,255,255,0.1);color:#fff;}
+.p-scope .card{background:#fff;border:1px solid #e8ecf0;border-radius:14px;padding:18px 20px;margin-bottom:16px;}
+.p-scope .card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.p-scope .card-title{font-size:14px;font-weight:600;color:#111;}
+.p-scope .card-sub-title, .p-scope .card-sub{font-size:11px;color:#6b7280;margin-top:2px;}
+.p-scope .divider{height:1px;background:#f3f4f6;margin:14px 0;}
+.p-scope .tag{font-size:10px;padding:2px 8px;border-radius:6px;font-weight:500;}
+.p-scope .tag-green{background:#dcfce7;color:#166534;}
+.p-scope .tag-blue{background:#dbeafe;color:#1e40af;}
+.p-scope .tag-orange{background:#ffedd5;color:#9a3412;}
+.p-scope .tag-gray{background:#f3f4f6;color:#4b5563;border:0.5px solid #e0e4ea;}
+.p-scope .tag-yellow{background:#fef3c7;color:#92400e;}
+.p-scope .btn-dark{background:#0B1D35;color:#fff;border:none;border-radius:10px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;transition:opacity 0.15s;}
+.p-scope .btn-accent{background:#4BA3E3;color:#0B1D35;border:none;border-radius:10px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;transition:opacity 0.15s;}
+.p-scope .btn-outline{font-size:12px;padding:6px 14px;background:transparent;color:#374151;border:1px solid #e0e4ea;border-radius:8px;cursor:pointer;}
+.p-scope .btn-full{width:100%;border-radius:10px;padding:12px;font-size:14px;font-weight:600;cursor:pointer;border:none;}
+.p-scope .text-link{font-size:12px;color:#185FA5;cursor:pointer;font-weight:500;border:none;background:transparent;}
+
+/* P2 Specific (Resource Library) */
+#p2-view .app{background:#fff;min-height:100vh;display:flex;flex-direction:column;}
+#p2-view .search-wrap{flex:1;max-width:400px;position:relative;}
+#p2-view .search-wrap input{width:100%;background:rgba(255,255,255,0.08);border:0.5px solid rgba(255,255,255,0.15);border-radius:20px;padding:7px 14px 7px 36px;font-size:13px;color:#fff;outline:none;}
+#p2-view .search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:0.4;font-size:13px;}
+#p2-view .body{display:grid;grid-template-columns:210px 1fr;flex:1;}
+#p2-view .sidebar{border-right:1px solid #e8ecf0;padding:14px;background:#f8fafc;overflow-y:auto;}
+#p2-view .slabel{font-size:10px;color:#6b7280;text-transform:uppercase;letter-spacing:0.07em;margin:14px 0 6px;}
+#p2-view .subject-btn{display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:8px;font-size:12px;color:#374151;cursor:pointer;transition:background 0.12s;}
+#p2-view .subject-btn.on{background:#dbeafe;color:#1e40af;font-weight:500;}
+#p2-view .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+#p2-view .sitem{display:flex;align-items:center;gap:7px;padding:5px 2px;font-size:12px;color:#374151;cursor:pointer;}
+#p2-view .rep-box{background:#0B1D35;border-radius:10px;padding:11px 13px;margin-top:14px;}
+#p2-view .main{padding:18px;min-width:0;overflow-y:auto;}
+#p2-view .tab-row{display:flex;gap:0;border-bottom:1px solid #e8ecf0;margin-bottom:16px;overflow-x:auto;}
+#p2-view .tab{font-size:13px;padding:8px 14px;color:#6b7280;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;}
+#p2-view .tab.on{color:#185FA5;border-bottom-color:#185FA5;font-weight:500;}
+#p2-view .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px;}
+#p2-view .stat{background:#f8fafc;border-radius:8px;padding:9px 11px;}
+#p2-view .filter-row{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;align-items:center;}
+#p2-view .fchip{font-size:11px;padding:4px 10px;border-radius:20px;border:0.5px solid #d1d5db;color:#6b7280;cursor:pointer;background:#fff;}
+#p2-view .fchip.on{background:#0B1D35;color:#fff;border-color:#0B1D35;}
+#p2-view .card-list{display:flex;flex-direction:column;gap:10px;}
+#p2-view .cicon{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;flex-shrink:0;}
+
+/* P1 Specific (Study Streak) */
+#p1-view .page{display:none;padding:24px;max-width:1000px;margin:0 auto;}
+#p1-view .page.on{display:block;}
+#p1-view .streak-pill{display:flex;align-items:center;gap:6px;background:#FF6B2B;border-radius:20px;padding:5px 12px;font-size:12px;font-weight:700;color:#fff;cursor:pointer;border:none;}
+#p1-view .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;}
+#p1-view .cal-day{height:32px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;cursor:pointer;}
+#p1-view .cal-day.done{background:#dcfce7;color:#166534;}
+#p1-view .cal-day.today{background:#0B1D35;color:#fff;}
+#p1-view .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
+#p1-view .stat{background:#fff;border:1px solid #e8ecf0;border-radius:12px;padding:14px;}
+#p1-view .circle-row{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;margin-bottom:6px;cursor:pointer;}
+#p1-view .circle-row.me{background:#eff6ff;border-color:#bfdbfe;}
+
+/* P3 Specific (Uni Goals) */
+#p3-view .page{display:none;padding:24px;max-width:1040px;margin:0 auto;}
+#p3-view .page.on{display:block;}
+#p3-view .search-hero{background:#0B1D35;border-radius:14px;padding:22px 24px;margin-bottom:16px;}
+#p3-view .sh-search-row input, #p3-view .sh-search-row select{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:9px 13px;font-size:13px;color:#fff;outline:none;}
+#p3-view .uni-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px;margin-bottom:16px;}
+#p3-view .uni-card{background:#fff;border:1px solid #e8ecf0;border-radius:14px;padding:16px;}
+#p3-view .uni-card.reach{border-left:3px solid #dc2626;border-radius:0 14px 14px 0;}
+#p3-view .uni-card.target{border-left:3px solid #d97706;border-radius:0 14px 14px 0;}
+#p3-view .uni-card.likely{border-left:3px solid #16a34a;border-radius:0 14px 14px 0;}
+#p3-view .uc-logo{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;}
+#p3-view .gap-table{width:100%;border-collapse:collapse;}
+#p3-view .gap-table th{font-size:11px;font-weight:600;color:#6b7280;padding:8px 12px;text-align:left;border-bottom:1px solid #f3f4f6;background:#f8fafc;}
+#p3-view .gap-table td{padding:12px;border-bottom:1px solid #f9fafb;}
+
+/* Shared Overlays (Toasts & Modals) scoped to prevent clash */
+.p-toast{position:fixed;bottom:90px;right:24px;background:#0B1D35;color:#fff;font-size:13px;padding:10px 18px;border-radius:10px;opacity:0;transform:translate3d(0, 8px, 0);transition:all 0.25s;pointer-events:none;z-index:9999;}
+.p-toast.show{opacity:1;transform:translate3d(0, 0, 0);}
+.p-modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9000;align-items:center;justify-content:center;}
+.p-modal-bg.open{display:flex;}
+.p-modal{background:#fff;border-radius:16px;padding:26px;width:440px;max-width:90vw;color:#111;}
+
+</style>
+</head>
+<body>
+
+<div class="cursor-glow" id="cursorGlow"></div>
+
+<nav class="glass-dock">
+  <button class="dock-btn active" onclick="switchView('landing', this)">Home</button>
+  <button class="dock-btn" onclick="switchView('p2', this)">Library</button>
+  <button class="dock-btn" onclick="switchView('p1', this)">Study Streak</button>
+  <button class="dock-btn" onclick="switchView('p3', this)">Uni Goals</button>
+</nav>
+
+<main id="landing-view" class="master-view active">
+  <div class="hero-section">
+    <div class="hero-tag">System Architecture Upgraded</div>
+    <h1 class="hero-title">SortMyPrep.<br>Clarity in the Chaos.</h1>
+    <p class="hero-sub">The IB journey is fragmented across countless drives, scattered notes, and uncalibrated expectations. We built a high-performance ecosystem to centralize your workflow.</p>
+  </div>
+
+  <div class="glass-panel">
+    <h2>Why this exists</h2>
+    <p>Students waste hundreds of hours managing the meta-work of studying rather than actually learning. SortMyPrep implements a production-ready architecture to unify data-driven gap analysis, community-curated resources, and intelligent study streaks. By replacing friction with liquid-smooth UI and hardware-accelerated workflows, we keep you focused on what matters: the score.</p>
+  </div>
+
+
+  
+
+  <div class="glass-panel" style="background: transparent; border: none; padding: 0; box-shadow: none;">
+    <h2>Explore the Architecture</h2>
+    <div class="showcase-grid">
+      <div class="showcase-card" onclick="switchView('p2', document.querySelectorAll('.dock-btn')[1])">
+        <div class="sc-icon">📚</div>
+        <div class="sc-title">Resource Library</div>
+        <div class="sc-desc">A highly optimized repository for past papers and verified notes. Find exactly what you need with robust filtering and reputation-based community trust.</div>
+      </div>
+      <div class="showcase-card" onclick="switchView('p1', document.querySelectorAll('.dock-btn')[2])">
+        <div class="sc-icon">🔥</div>
+        <div class="sc-title">Study Streak & Circle</div>
+        <div class="sc-desc">Accountability engineered through gamification. Track daily progress, set precise targets, and engage in opt-in, rank-based study circles without toxic comparison.</div>
+      </div>
+      <div class="showcase-card" onclick="switchView('p3', document.querySelectorAll('.dock-btn')[3])">
+        <div class="sc-icon">🎯</div>
+        <div class="sc-title">University Goal Planner</div>
+        <div class="sc-desc">Reverse-engineer your study plan. Cross-reference real-time predicted grades against international university requirements with automated gap analysis.</div>
+      </div>
+    </div>
+  </div>
+</main>
+
+
+<main id="p2-view" class="master-view light-theme-wrapper p-scope">
+  <div class="app">
+    <div class="topbar">
+      <div class="logo">Sort<span>MyPrep</span></div>
+      <div class="search-wrap">
+        <span class="search-icon">&#128269;</span>
+        <input id="p2-searchInput" placeholder="Search past papers, notes, topics..." oninput="p2_filterCards()" />
+      </div>
+      <div class="nav top-nav">
+        <div class="tnav on" onclick="p2_setNav(this)">Library</div>
+        <div class="tnav" onclick="p2_setNav(this)">My saves</div>
+        <div class="tnav" onclick="p2_setNav(this)">Progress</div>
+      </div>
+      <div class="avatar" title="Aryan Shah">AS</div>
+    </div>
+
+    <div class="body">
+      <div class="sidebar">
+        <div class="slabel">Board</div>
+        <label class="sitem"><input type="checkbox" checked onchange="p2_filterCards()" /> IB Diploma</label>
+        <label class="sitem"><input type="checkbox" onchange="p2_filterCards()" /> IGCSE</label>
+
+        <div class="slabel">Subject</div>
+        <div class="subject-btn on" onclick="p2_setSubject(this,'Maths AA HL','#378ADD')"><div class="dot" style="background:#378ADD;"></div>Maths AA HL</div>
+        <div class="subject-btn" onclick="p2_setSubject(this,'Physics HL','#639922')"><div class="dot" style="background:#639922;"></div>Physics HL</div>
+        <div class="subject-btn" onclick="p2_setSubject(this,'Chemistry SL','#1D9E75')"><div class="dot" style="background:#1D9E75;"></div>Chemistry SL</div>
+
+        <div class="divider"></div>
+        <div class="slabel">Resource type</div>
+        <label class="sitem"><input type="checkbox" checked onchange="p2_filterCards()" data-p2-type="paper" /> Past papers</label>
+        <label class="sitem"><input type="checkbox" checked onchange="p2_filterCards()" data-p2-type="notes" /> Student notes</label>
+
+        <div class="divider"></div>
+        <div class="slabel">Year</div>
+        <label class="sitem"><input type="checkbox" checked onchange="p2_filterCards()" data-p2-year="2024" /> 2024</label>
+        <label class="sitem"><input type="checkbox" checked onchange="p2_filterCards()" data-p2-year="2023" /> 2023</label>
+
+        <div class="rep-box">
+          <div style="font-size:12px;font-weight:500;color:#fff;">Aryan Shah</div>
+          <div style="font-size:10px;color:rgba(255,255,255,0.4);">Class of 2025</div>
+          <div style="display:flex;align-items:baseline;gap:4px;margin-top:4px;">
+            <div style="font-size:22px;font-weight:600;color:#4BA3E3;" id="p2-repScore">1,240</div>
+            <div style="font-size:11px;color:rgba(255,255,255,0.4);">rep pts</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="main">
+        <div style="font-size:12px;color:#6b7280;margin-bottom:12px;">Library / IB Diploma / <span id="p2-currentSubject" style="color:#111;">Maths AA HL</span></div>
+        <div class="tab-row">
+          <div class="tab on" onclick="p2_setTab(this,'all')">All resources</div>
+          <div class="tab" onclick="p2_setTab(this,'paper')">Past papers</div>
+          <div class="tab" onclick="p2_setTab(this,'notes')">Student notes</div>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat"><div style="font-size:18px;font-weight:600;" id="p2-stat-total">82</div><div style="font-size:10px;color:#6b7280;">Total resources</div></div>
+          <div class="stat"><div style="font-size:18px;font-weight:600;">100%</div><div style="font-size:10px;color:#6b7280;">Free to access</div></div>
+        </div>
+
+        <div class="filter-row" id="p2-filterRow">
+          <div class="fchip on" onclick="p2_setChip(this,'all')">All</div>
+          <div class="fchip" onclick="p2_setChip(this,'2024')">2024</div>
+          <div class="fchip" onclick="p2_setChip(this,'calculus')">Calculus</div>
+          <button class="btn-accent" style="margin-left:auto;padding:6px 14px;font-size:12px;" onclick="p2_showToast('Contribute modal opened')">+ Contribute notes</button>
+        </div>
+
+        <div class="card-list" id="p2-cardList"></div>
+      </div>
+    </div>
+  </div>
+  <div class="p-toast" id="p2-toast"></div>
+</main>
+
+
+<main id="p1-view" class="master-view light-theme-wrapper p-scope">
+  <div class="topbar">
+    <div class="logo">Sort<span>MyPrep</span></div>
+    <div class="top-nav">
+      <button class="tnav on" onclick="p1_goPage('dashboard',this)">Dashboard</button>
+      <button class="tnav" onclick="p1_goPage('targets',this)">My targets</button>
+      <button class="tnav" onclick="p1_goPage('circle',this)">Study circle</button>
+    </div>
+    <button class="streak-pill" onclick="p1_goPage('dashboard',document.querySelector('#p1-view .tnav'))">
+      🔥 <span id="p1-topStreakNum">12</span>
+    </button>
+    <div class="avatar">AS</div>
+  </div>
+
+  <div class="page on" id="p1-page-dashboard">
+    <div style="display:flex;justify-content:space-between;margin-bottom:20px;">
+      <div>
+        <h1 style="font-size:20px;font-weight:700;margin-bottom:4px;">Good morning, Aryan 👋</h1>
+        <p style="font-size:13px;color:#6b7280;">You're on a <strong>12-day streak</strong> — don't break it today.</p>
+      </div>
+      <button class="btn-dark" onclick="p1_goPage('targets',document.querySelectorAll('#p1-view .tnav')[1])">Edit targets</button>
+    </div>
+
+    <div class="card">
+      <div class="card-top">
+        <div>
+          <div class="card-title">Study streak — April 2026</div>
+          <div class="card-sub-title">Each green square is a day you studied</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:24px;font-weight:700;color:#FF6B2B;">🔥 <span id="p1-streakNum">12</span></div>
+          <div class="card-sub-title">day streak</div>
+        </div>
+      </div>
+      <div class="cal-grid" id="p1-calGrid"></div>
+      <div style="background:#fef3c7;border-radius:10px;padding:10px;margin-top:12px;display:flex;gap:10px;align-items:center;" id="p1-nudgeBanner">
+        <span>⚡</span>
+        <div style="font-size:12px;color:#92400e;flex:1;">You haven't logged a study session today. Keep your streak alive!</div>
+        <button class="btn-accent" style="padding:5px 12px;font-size:11px;" onclick="p1_markToday()">Log today ✓</button>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat"><div style="font-size:22px;font-weight:700;" id="p1-dashStreak">12</div><div style="font-size:11px;color:#6b7280;">Day streak</div></div>
+      <div class="stat"><div style="font-size:22px;font-weight:700;">47h</div><div style="font-size:11px;color:#6b7280;">Studied this month</div></div>
+      <div class="stat"><div style="font-size:22px;font-weight:700;">#2</div><div style="font-size:11px;color:#6b7280;">Study circle rank</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-top">
+        <div class="card-title">Study circle (Mini)</div>
+        <button class="btn-outline" onclick="p1_goPage('circle',document.querySelectorAll('#p1-view .tnav')[2])">See full circle</button>
+      </div>
+      <div id="p1-miniCircle"></div>
+    </div>
+  </div>
+
+  <div class="page" id="p1-page-targets">
+    <div style="margin-bottom:20px;">
+      <h2 style="font-size:18px;font-weight:700;margin-bottom:4px;">Set your weekly targets</h2>
+    </div>
+    <div class="card">
+      <div id="p1-subjectSliders" style="margin-bottom:20px;"></div>
+      <button class="btn-full btn-dark" onclick="p1_toast('Targets saved successfully')">Save targets</button>
+    </div>
+  </div>
+
+  <div class="page" id="p1-page-circle">
+    <div style="margin-bottom:20px;">
+      <h2 style="font-size:18px;font-weight:700;margin-bottom:4px;">Study circle</h2>
+      <p style="font-size:13px;color:#6b7280;">Ranked by most improved this week.</p>
+    </div>
+    <div class="card">
+      <div id="p1-fullCircle"></div>
+    </div>
+  </div>
+
+  <div class="p-toast" id="p1-toast"></div>
+</main>
+
+
+<main id="p3-view" class="master-view light-theme-wrapper p-scope">
+  <div class="topbar">
+    <div class="logo">Sort<span>MyPrep</span></div>
+    <div class="top-nav">
+      <button class="tnav on" onclick="p3_goPage('shortlist',this)">University shortlist</button>
+      <button class="tnav" onclick="p3_goPage('plan',this)">My study plan</button>
+      <button class="tnav" onclick="p3_goPage('gaps',this)">Gap analysis</button>
+    </div>
+    <div class="avatar">AS</div>
+  </div>
+
+  <div class="page on" id="p3-page-shortlist">
+    <div class="search-hero">
+      <div style="font-size:16px;font-weight:700;margin-bottom:4px;color:#fff;">Find universities that match your IB scores</div>
+      <div class="sh-search-row" style="margin-top:14px;">
+        <input id="p3-uniSearch" placeholder="Search university..." oninput="p3_renderUnis()"/>
+        <select id="p3-categoryFilter" onchange="p3_renderUnis()">
+          <option value="">All categories</option>
+          <option value="reach">Reach</option>
+          <option value="target">Target</option>
+        </select>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 320px;gap:16px;">
+      <div class="uni-grid" id="p3-uniGrid"></div>
+      <div>
+        <div class="card" style="position:sticky;top:68px;">
+          <div class="card-top">
+            <div class="card-title">My shortlist</div>
+            <div class="card-sub" id="p3-shortlistCount">0 added</div>
+          </div>
+          <div id="p3-myShortlist"></div>
+          <button class="btn-full btn-accent" style="margin-top:14px;" onclick="p3_goPage('plan',document.querySelectorAll('#p3-view .tnav')[1])">Generate plan →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page" id="p3-page-plan">
+    <div style="margin-bottom:20px;">
+      <h2 style="font-size:18px;font-weight:700;">Your reverse-engineered study plan</h2>
+    </div>
+    <div class="card">
+      <div class="card-top"><div class="card-title">This week's sessions</div></div>
+      <div id="p3-weekPlan"></div>
+    </div>
+  </div>
+
+  <div class="page" id="p3-page-gaps">
+    <div style="margin-bottom:20px;">
+      <h2 style="font-size:18px;font-weight:700;">Gap analysis</h2>
+    </div>
+    <div class="card">
+      <table class="gap-table" id="p3-gapTable"></table>
+    </div>
+  </div>
+
+  <div class="p-toast" id="p3-toast"></div>
+</main>
+
+
+<script>
+// --- MASTER LOGIC ---
+function switchView(viewId, btnEl) {
+  // Update dock buttons
+  document.querySelectorAll('.dock-btn').forEach(btn => btn.classList.remove('active'));
+  btnEl.classList.add('active');
+
+  // Switch views with hardware accelerated transition handling
+  document.querySelectorAll('.master-view').forEach(v => {
+    v.classList.remove('active');
+  });
+  
+  const target = document.getElementById(viewId === 'landing' ? 'landing-view' : viewId + '-view');
+  target.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Optimized Cursor Glow using requestAnimationFrame
+const cursor = document.getElementById('cursorGlow');
+let mouseX = window.innerWidth / 2;
+let mouseY = window.innerHeight / 2;
+let cursorX = mouseX;
+let cursorY = mouseY;
+
+window.addEventListener('mousemove', (e) => {
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+});
+
+function animateCursor() {
+  // Smooth interpolation
+  cursorX += (mouseX - cursorX) * 0.15;
+  cursorY += (mouseY - cursorY) * 0.15;
+  cursor.style.transform = `translate3d(calc(${cursorX}px - 50%), calc(${cursorY}px - 50%), 0)`;
+  requestAnimationFrame(animateCursor);
+}
+requestAnimationFrame(animateCursor);
+
+
+// --- P2 LOGIC (Library) ---
+const p2_cards = [
+  {id:1, type:'notes', year:'2023', tags:['calculus'], title:'Complete Calculus notes', meta:['Maths AA HL'], ctags:[{cls:'tag-blue',txt:'Verified'}], icon:'N', iconBg:'#dcfce7', iconColor:'#166534', contrib:{name:'Meera Kapoor'}},
+  {id:2, type:'paper', year:'2024', tags:['paper1'], title:'Maths AA HL — Paper 1 — May 2024', meta:['Past paper'], ctags:[{cls:'tag-blue',txt:'Official'}], icon:'P', iconBg:'#dbeafe', iconColor:'#1e40af', contrib:{name:'SortMyPrep'}},
+  {id:3, type:'paper', year:'2024', tags:['paper2'], title:'Maths AA HL — Paper 2 — May 2024', meta:['Past paper'], ctags:[{cls:'tag-blue',txt:'Official'}], icon:'P', iconBg:'#dbeafe', iconColor:'#1e40af', contrib:{name:'SortMyPrep'}}
+];
+let p2_tab = 'all', p2_chip = 'all';
+
+function p2_showToast(msg) {
+  const t = document.getElementById('p2-toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._timer); t._timer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function p2_filterCards() {
+  const list = document.getElementById('p2-cardList');
+  const search = document.getElementById('p2-searchInput').value.toLowerCase();
+  
+  const filtered = p2_cards.filter(c => {
+    if (p2_tab !== 'all' && c.type !== p2_tab) return false;
+    if (p2_chip !== 'all' && p2_chip === '2024' && c.year !== '2024') return false;
+    if (search && !c.title.toLowerCase().includes(search)) return false;
+    return true;
+  });
+
+  list.innerHTML = filtered.map(c => `
+    <div class="card" style="margin-bottom:0;">
+      <div style="display:flex; gap:10px; align-items:center;">
+        <div class="cicon" style="background:${c.iconBg};color:${c.iconColor};width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:600;">${c.icon}</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:600;">${c.title}</div>
+          <div style="font-size:11px;color:#6b7280;margin-top:2px;">${c.meta.join(', ')} · By ${c.contrib.name}</div>
+        </div>
+        <button class="btn-dark" style="padding:6px 12px;font-size:11px;" onclick="p2_showToast('Downloading...')">Download</button>
+      </div>
+    </div>`).join('');
+}
+
+function p2_setNav(el) { document.querySelectorAll('#p2-view .tnav').forEach(n => n.classList.remove('on')); el.classList.add('on'); }
+function p2_setTab(el, tab) { document.querySelectorAll('#p2-view .tab').forEach(t => t.classList.remove('on')); el.classList.add('on'); p2_tab = tab; p2_filterCards(); }
+function p2_setChip(el, chip) { document.querySelectorAll('#p2-view .fchip').forEach(c => c.classList.remove('on')); el.classList.add('on'); p2_chip = chip; p2_filterCards(); }
+function p2_setSubject(el, name) { document.querySelectorAll('#p2-view .subject-btn').forEach(b => b.classList.remove('on')); el.classList.add('on'); document.getElementById('p2-currentSubject').textContent = name; p2_filterCards(); }
+p2_filterCards();
+
+
+// --- P1 LOGIC (Study Streak) ---
+let p1_streak = 12;
+const p1_members = [
+  {init:'AS', bg:'#dbeafe', color:'#1e40af', name:'Aryan Shah (you)', sub:'Maths AA HL', streak:12, imp:+18, me:true},
+  {init:'MK', bg:'#dcfce7', color:'#166534', name:'Meera Kapoor', sub:'History HL', streak:18, imp:+32, me:false},
+  {init:'RN', bg:'#f3e8ff', color:'#6b21a8', name:'Rohit Nair', sub:'Physics HL', streak:9, imp:+9, me:false}
+];
+
+function p1_toast(msg) {
+  const t = document.getElementById('p1-toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._timer); t._timer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function p1_goPage(id, navEl) {
+  document.querySelectorAll('#p1-view .page').forEach(p => p.classList.remove('on'));
+  document.getElementById('p1-page-' + id).classList.add('on');
+  document.querySelectorAll('#p1-view .tnav').forEach(n => n.classList.remove('on'));
+  navEl.classList.add('on');
+}
+
+function p1_buildCal() {
+  const grid = document.getElementById('p1-calGrid');
+  let html = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(l=>`<div style="font-size:10px;color:#9ca3af;text-align:center;">${l}</div>`).join('');
+  for(let i=1; i<=30; i++) {
+    let cls = 'cal-day ' + (i===13 ? 'today' : (i<13 && i>=13-12 ? 'done' : ''));
+    html += `<div class="${cls}" style="background:${i===13?'#0B1D35':i<13&&i>=1?'#dcfce7':'#f3f4f6'};color:${i===13?'#fff':i<13&&i>=1?'#166534':'#9ca3af'};">${i}</div>`;
+  }
+  grid.innerHTML = html;
+}
+
+function p1_markToday() {
+  p1_streak++;
+  document.getElementById('p1-streakNum').textContent = p1_streak;
+  document.getElementById('p1-topStreakNum').textContent = p1_streak;
+  document.getElementById('p1-dashStreak').textContent = p1_streak;
+  document.getElementById('p1-nudgeBanner').style.display = 'none';
+  p1_toast('🔥 Streak updated!');
+}
+
+function p1_buildCircle() {
+  const html = p1_members.map((m,i) => `
+    <div class="circle-row ${m.me?'me':''}">
+      <div style="width:30px;height:30px;border-radius:50%;background:${m.bg};color:${m.color};display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">${m.init}</div>
+      <div style="flex:1;"><div style="font-size:13px;font-weight:600;">${m.name}</div><div style="font-size:11px;color:#6b7280;">${m.sub}</div></div>
+      <div style="font-size:12px;font-weight:600;color:#16a34a;">↑ +${m.imp}%</div>
+    </div>
+  `).join('');
+  document.getElementById('p1-miniCircle').innerHTML = html;
+  document.getElementById('p1-fullCircle').innerHTML = html;
+}
+p1_buildCal();
+p1_buildCircle();
+
+
+// --- P3 LOGIC (Uni Goals) ---
+const p3_unis = [
+  {id:1, logo:'IC', bg:'#dbeafe', c:'#1e40af', name:'Imperial College', course:'Engineering', pts:39, cat:'reach'},
+  {id:2, logo:'ED', bg:'#f3e8ff', c:'#6b21a8', name:'Univ of Edinburgh', course:'Mech Eng', pts:37, cat:'target'},
+  {id:3, logo:'TU', bg:'#fef3c7', c:'#92400e', name:'TU Delft', course:'Aerospace', pts:36, cat:'target'}
+];
+let p3_saved = new Set();
+
+function p3_toast(msg) {
+  const t = document.getElementById('p3-toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._timer); t._timer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function p3_goPage(id, navEl) {
+  document.querySelectorAll('#p3-view .page').forEach(p => p.classList.remove('on'));
+  document.getElementById('p3-page-' + id).classList.add('on');
+  document.querySelectorAll('#p3-view .tnav').forEach(n => n.classList.remove('on'));
+  navEl.classList.add('on');
+}
+
+function p3_renderUnis() {
+  const cat = document.getElementById('p3-categoryFilter').value;
+  const search = document.getElementById('p3-uniSearch').value.toLowerCase();
+  
+  const filtered = p3_unis.filter(u => {
+    if(cat && u.cat !== cat) return false;
+    if(search && !u.name.toLowerCase().includes(search)) return false;
+    return true;
+  });
+
+  document.getElementById('p3-uniGrid').innerHTML = filtered.map(u => {
+    const isSaved = p3_saved.has(u.id);
+    return `
+    <div class="uni-card ${u.cat}">
+      <div style="display:flex;gap:10px;">
+        <div class="uc-logo" style="background:${u.bg};color:${u.c};">${u.logo}</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:600;">${u.name}</div>
+          <div style="font-size:11px;color:#6b7280;">${u.course} · IB ${u.pts}+</div>
+        </div>
+        <button class="btn-dark" style="font-size:11px;padding:4px 10px;background:${isSaved?'#166534':'#0B1D35'}" onclick="p3_toggle(${u.id})">${isSaved?'Added ✓':'Add'}</button>
+      </div>
+    </div>`;
+  }).join('');
+  
+  document.getElementById('p3-shortlistCount').textContent = p3_saved.size + ' added';
+  
+  if(p3_saved.size === 0) {
+    document.getElementById('p3-myShortlist').innerHTML = '<div style="font-size:12px;color:#9ca3af;padding:20px;text-align:center;">Add universities to build plan</div>';
+  } else {
+    document.getElementById('p3-myShortlist').innerHTML = [...p3_saved].map(id => {
+      let u = p3_unis.find(x=>x.id===id);
+      return `<div style="font-size:13px;padding:8px;border-bottom:1px solid #f3f4f6;">${u.name}</div>`;
+    }).join('');
+  }
+}
+
+function p3_toggle(id) {
+  if(p3_saved.has(id)) { p3_saved.delete(id); p3_toast('Removed'); }
+  else { p3_saved.add(id); p3_toast('Added to shortlist'); }
+  p3_renderUnis();
+}
+
+function p3_initGaps() {
+  document.getElementById('p3-gapTable').innerHTML = `
+    <thead><tr><th>Subject</th><th>Current</th><th>Required</th><th>Gap</th></tr></thead>
+    <tbody>
+      <tr><td>Maths AA HL</td><td><div style="color:#4BA3E3;font-weight:600;">6/7</div></td><td>7</td><td><span class="tag tag-orange">1 grade</span></td></tr>
+      <tr><td>Physics HL</td><td><div style="color:#dc2626;font-weight:600;">5/7</div></td><td>7</td><td><span class="tag tag-red">2 grades</span></td></tr>
+      <tr><td>Chemistry SL</td><td><div style="color:#16a34a;font-weight:600;">6/7</div></td><td>6</td><td><span class="tag tag-green">Met</span></td></tr>
+    </tbody>
+  `;
+  document.getElementById('p3-weekPlan').innerHTML = `
+    <div style="padding:10px;border-bottom:1px solid #f3f4f6;font-size:13px;"><strong>Mon:</strong> Physics HL (Topic 6) — 2h</div>
+    <div style="padding:10px;border-bottom:1px solid #f3f4f6;font-size:13px;"><strong>Tue:</strong> Maths AA HL (Integration) — 1.5h</div>
+  `;
+}
+
+p3_renderUnis();
+p3_initGaps();
+
+</script>
+</body>
+</html>
